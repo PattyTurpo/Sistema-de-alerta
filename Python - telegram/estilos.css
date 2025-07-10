@@ -1,0 +1,126 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    background: #f0f0f0;
+}
+
+.barra-lateral {
+    width: 300px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.barra-lateral h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.barra-lateral button {
+    background-color: #34495e;
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.barra-lateral button:hover {
+    background-color: #3d566e;
+}
+
+.contenido-principal {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.panel-imagenes {
+    width: 60%;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    max-height: 90vh;
+    flex-wrap: wrap;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-detalle {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.item-imagen {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.item-imagen img {
+    width: 120px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.item-imagen:hover img,
+.item-imagen.selected img {
+    border-color: #2980b9;
+}
+
+.info-imagen {
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+}
+
+.titulo-mes {
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    color: #2980b9;
+    border-bottom: 2px solid #2980b9;
+    padding-bottom: 4px;
+}
+
+.detalles-foto {
+    margin-top: 12px;
+    font-size: 16px;
+    color: #555;
+    background-color: #ecf0f1;
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: 90%;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.panel-detalle img {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
