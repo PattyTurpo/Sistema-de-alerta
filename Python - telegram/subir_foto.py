@@ -12,8 +12,8 @@ os.makedirs(upload_folder, exist_ok=True)
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 
 # 🔐 Datos de Telegram
-BOT_TOKEN = "7566014980:AAFHByjv_ipK-AQ64fcTrOhPFtKRm4mzvq0"
-CHAT_ID = "7271105781"
+BOT_TOKEN = "7"
+CHAT_ID = "7"
 
 # 🌐 URL de ESP32-CAM y servidor PHP
 ESP32_CAM_URL = "http://192.168.121.7/capture"
