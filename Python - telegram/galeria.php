@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>Galería de Imágenes - Proyecto Redes</title>
     <link rel="stylesheet" href="estilos.css">
-    <script src="funciones.js" defer></script>
 </head>
 
 <body>
@@ -49,5 +48,7 @@
             <div class="detalles-foto" id="detalles-foto">Aquí aparecerán los detalles</div>
         </div>
     </div>
+        <script src="funciones.js" defer></script>
+
 </body>
 </html>

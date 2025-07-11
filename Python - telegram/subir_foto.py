@@ -1,5 +1,4 @@
 import requests
-import time
 import datetime
 import os
 import cv2
@@ -12,12 +11,13 @@ os.makedirs(upload_folder, exist_ok=True)
 # 🧠 Clasificador de rostros
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 
-# 🔐 Datos reales de Telegram
+# 🔐 Datos de Telegram
 BOT_TOKEN = "7566014980:AAFHByjv_ipK-AQ64fcTrOhPFtKRm4mzvq0"
 CHAT_ID = "7271105781"
 
-# 🌐 URL del servidor PHP
-SERVIDOR_URL = "http://192.168.56.1/upload.php"
+# 🌐 URL de ESP32-CAM y servidor PHP
+ESP32_CAM_URL = "http://192.168.121.7/capture"
+SERVIDOR_URL = "http://localhost/upload.php"
 
 # 📤 Subir imagen al servidor
 def subir_archivo(ruta_local, servidor_url):
@@ -26,7 +26,7 @@ def subir_archivo(ruta_local, servidor_url):
         response = requests.post(servidor_url, files=files)
     return response
 
-# ✉ Enviar imagen a Telegram
+# ✉ Enviar a Telegram
 def enviar_a_telegram(imagen_path):
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
@@ -39,49 +39,48 @@ def enviar_a_telegram(imagen_path):
     except Exception as e:
         print("❌ Conexión Telegram fallida:", e)
 
-# 📷 Capturar imagen desde la cámara de la PC
-def capturar_pc():
-    cam = cv2.VideoCapture(0)
-    if not cam.isOpened():
-        print("❌ No se pudo acceder a la cámara.")
-        return None
+# 🔁 Detección continua desde ESP32-CAM
+def detectar_desde_esp32():
+    rostro_detectado_anterior = False
 
-    ret, frame = cam.read()
-    cam.release()
+    try:
+        while True:
+            try:
+                # Obtener imagen del ESP32-CAM
+                resp = requests.get(ESP32_CAM_URL, timeout=2)
+                if resp.status_code != 200:
+                    continue
+                img_array = np.frombuffer(resp.content, np.uint8)
+                frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
-    if ret:
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        img_path = f"{upload_folder}/foto_{timestamp}.jpg"
-        cv2.imwrite(img_path, frame)
-        return img_path
-    else:
-        print("❌ No se pudo capturar imagen.")
-        return None
+                if frame is None:
+                    continue
 
-# 🤖 Detectar rostro y subir
-def detectar_y_subir():
-    img_path = capturar_pc()
-    if img_path is None:
-        return
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
 
-    img = cv2.imread(img_path)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+                if len(faces) > 0:
+                    if not rostro_detectado_anterior:
+                        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                        img_path = f"{upload_folder}/rostro_{timestamp}.jpg"
+                        cv2.imwrite(img_path, frame)
 
-    if len(faces) > 0:
-        response = subir_archivo(img_path, SERVIDOR_URL)
-        if response.status_code == 200:
-            enviar_a_telegram(img_path)
-            print(f"📸 Imagen con rostro enviada: {img_path}")
-        else:
-            print("⚠ Error al subir imagen.")
-    else:
-        print("ℹ No se detectó rostro.")
+                        response = subir_archivo(img_path, SERVIDOR_URL)
+                        if response.status_code == 200:
+                            enviar_a_telegram(img_path)
+                            print(f"📸 Rostro detectado y enviado: {img_path}")
+                        else:
+                            print("⚠ Error al subir la imagen.")
 
-# 🔁 Bucle principal
-try:
-    while True:
-        detectar_y_subir()
-        time.sleep(2)
-except KeyboardInterrupt:
-    print("\n🛑 Programa finalizado.")
+                        rostro_detectado_anterior = True
+                else:
+                    rostro_detectado_anterior = False
+
+            except requests.exceptions.RequestException:
+                print("⚠ ESP32-CAM no responde. Reintentando...")
+
+    except KeyboardInterrupt:
+        print("\n🛑 Programa finalizado.")
+
+# ▶ Iniciar
+detectar_desde_esp32()
